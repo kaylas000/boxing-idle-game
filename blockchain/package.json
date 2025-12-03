@@ -1,0 +1,24 @@
+{
+  "name": "boxing-blockchain",
+  "version": "1.0.0",
+  "description": "Smart contracts for Boxing Champion",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network sepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network mainnet",
+    "verify": "hardhat verify"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.0.0",
+    "hardhat": "^2.19.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ethers": "^6.9.0"
+  }
+}
