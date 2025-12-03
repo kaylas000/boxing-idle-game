@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: boxing-game-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: boxing_user
+      POSTGRES_PASSWORD: boxing_password
+      POSTGRES_DB: boxing_game
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - boxing-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: boxing-game-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - boxing-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boxing-game-backend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - boxing-network
+    volumes:
+      - ./src:/app/src
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  boxing-network:
+    driver: bridge
