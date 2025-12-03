@@ -7,31 +7,44 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { NftMetadata } from './nft-metadata.entity';
+import { Player } from '../../player/entities/player.entity';
+import { NFTMetadata } from './nft-metadata.entity';
 
 @Entity('nfts')
-export class Nft {
+export class NFT {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })
   tokenId: string;
 
-  @Column()
-  ownerAddress: string;
+  @ManyToOne(() => Player)
+  owner: Player;
 
-  @Column()
-  nftType: string; // fighter, equipment, trophy
-
-  @ManyToOne(() => NftMetadata)
+  @ManyToOne(() => NFTMetadata)
   @JoinColumn()
-  metadata: NftMetadata;
+  metadata: NFTMetadata;
+
+  @Column()
+  type: string; // boxer, equipment, gym, trainer, title_belt
+
+  @Column()
+  rarity: string; // common, rare, epic, legendary, mythic
 
   @Column({ default: false })
-  isListed: boolean;
+  equipped: boolean; // Экипирован ли NFT
 
-  @Column({ type: 'decimal', precision: 18, scale: 8, nullable: true })
-  listPrice: number;
+  @Column({ default: false })
+  onChain: boolean; // Выпущен ли в блокчейн
+
+  @Column({ nullable: true })
+  contractAddress: string; // Адрес NFT Collection контракта
+
+  @Column({ nullable: true })
+  blockchainTxHash: string; // Hash транзакции минта в блокчейне
+
+  @Column({ type: 'timestamp' })
+  mintedAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;

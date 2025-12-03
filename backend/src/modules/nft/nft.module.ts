@@ -2,16 +2,17 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NftController } from './nft.controller';
 import { NftService } from './nft.service';
-import { Nft } from './entities/nft.entity';
-import { NftMetadata } from './entities/nft-metadata.entity';
+import { NFT } from './entities/nft.entity';
+import { NFTMetadata } from './entities/nft-metadata.entity';
+import { Player } from '../player/entities/player.entity';
 import { PlayerModule } from '../player/player.module';
-import { CryptoModule } from '../crypto/crypto.module';
+import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Nft, NftMetadata]),
+    TypeOrmModule.forFeature([NFT, NFTMetadata, Player]),
     PlayerModule,
-    CryptoModule,
+    BlockchainModule,
   ],
   controllers: [NftController],
   providers: [NftService],

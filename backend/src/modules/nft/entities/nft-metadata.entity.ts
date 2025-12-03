@@ -6,7 +6,7 @@ import {
 } from 'typeorm';
 
 @Entity('nft_metadata')
-export class NftMetadata {
+export class NFTMetadata {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -16,14 +16,38 @@ export class NftMetadata {
   @Column({ type: 'text' })
   description: string;
 
+  @Column({ type: 'text' })
+  image: string; // URL or IPFS hash
+
   @Column()
-  image: string;
+  type: string;
 
-  @Column({ default: 'common' })
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  @Column()
+  rarity: string;
 
-  @Column({ type: 'json' })
-  attributes: any[];
+  @Column({ type: 'jsonb' })
+  attributes: {
+    // Бонусы к характеристикам
+    powerBonus?: number;
+    speedBonus?: number;
+    staminaBonus?: number;
+    defenseBonus?: number;
+    
+    // Мультипликаторы
+    moneyMultiplier?: number;
+    expMultiplier?: number;
+    
+    // Специальные способности
+    specialAbility?: string;
+    
+    // Визуальные атрибуты
+    color?: string;
+    style?: string;
+    
+    // Уникальность
+    serialNumber?: number;
+    edition?: string;
+  };
 
   @CreateDateColumn()
   createdAt: Date;
