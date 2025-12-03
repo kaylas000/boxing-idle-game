@@ -3,28 +3,68 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fightAPI } from '@/lib/api';
 import { Target, Swords } from 'lucide-react';
+import PhaserGame from '@/components/PhaserGame';
+import { FightResult } from '@/game/FightScene';
 
 export default function FightPage() {
   const queryClient = useQueryClient();
   const [opponent, setOpponent] = useState<any>(null);
   const [fightResult, setFightResult] = useState<any>(null);
+  const [showGame, setShowGame] = useState(false);
+  const [gameConfig, setGameConfig] = useState<any>(null);
+
+  const { data: player } = useQuery({
+    queryKey: ['player'],
+    queryFn: () => playerAPI.getProfile().then(res => res.data),
+  });
 
   const generateMutation = useMutation({
     mutationFn: () => fightAPI.generateOpponent(),
     onSuccess: (response) => {
       setOpponent(response.data);
       setFightResult(null);
+      setShowGame(false);
     },
   });
 
   const fightMutation = useMutation({
     mutationFn: () => fightAPI.start(),
     onSuccess: (response) => {
-      setFightResult(response.data);
+      // Результат будет получен из Phaser игры
       queryClient.invalidateQueries({ queryKey: ['player'] });
       queryClient.invalidateQueries({ queryKey: ['stats'] });
     },
   });
+
+  const handleStartAnimatedFight = () => {
+    if (!player || !opponent) return;
+
+    setGameConfig({
+      player: {
+        name: player.username || 'Игрок',
+        power: player.power,
+        speed: player.speed,
+        stamina: player.stamina,
+        defense: player.defense,
+      },
+      opponent: {
+        name: opponent.name,
+        power: opponent.power,
+        speed: opponent.speed,
+        stamina: opponent.stamina,
+        defense: opponent.defense,
+      },
+    });
+
+    setShowGame(true);
+  };
+
+  const handleFightComplete = async (result: FightResult) => {
+    // Отправить результат на сервер
+    const serverResult = await fightMutation.mutateAsync();
+    setFightResult(serverResult.data);
+    setShowGame(false);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -36,7 +76,24 @@ export default function FightPage() {
         <p className="text-gray-400">Найдите противника и выйдите на ринг!</p>
       </motion.div>
 
-      {!opponent && !fightResult && (
+      {/* Показать Phaser игру */}
+      <AnimatePresence>
+        {showGame && gameConfig && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="mb-6"
+          >
+            <PhaserGame
+              config={gameConfig}
+              onComplete={handleFightComplete}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!opponent && !fightResult && !showGame && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -55,7 +112,7 @@ export default function FightPage() {
       )}
 
       <AnimatePresence>
-        {opponent && !fightResult && (
+        {opponent && !fightResult && !showGame && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -90,14 +147,24 @@ export default function FightPage() {
               </div>
             </div>
 
-            <button
-              onClick={() => fightMutation.mutate()}
-              disabled={fightMutation.isPending}
-              className="w-full btn btn-primary text-xl py-4"
-            >
-              <Swords className="inline w-6 h-6 mr-2" />
-              Начать бой!
-            </button>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={handleStartAnimatedFight}
+                disabled={fightMutation.isPending}
+                className="btn btn-primary text-xl py-4"
+              >
+                <Swords className="inline w-6 h-6 mr-2" />
+                Бой с анимацией!
+              </button>
+              
+              <button
+                onClick={() => fightMutation.mutate()}
+                disabled={fightMutation.isPending}
+                className="btn btn-secondary text-xl py-4"
+              >
+                ⚡ Быстрый бой
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
