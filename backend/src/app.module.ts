@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { HealthModule } from './health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PlayerModule } from './modules/player/player.module';
 import { TrainingModule } from './modules/training/training.module';
@@ -43,6 +44,9 @@ import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
 
     // Schedule for cron jobs
     ScheduleModule.forRoot(),
+
+    // Health check
+    HealthModule,
 
     // Feature modules
     AuthModule,
