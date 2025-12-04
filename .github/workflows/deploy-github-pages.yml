@@ -1,0 +1,65 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        env:
+          VITE_BACKEND_URL: https://boxing-backend.up.railway.app
+          VITE_WS_URL: wss://boxing-backend.up.railway.app
+        run: npm run build
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './frontend/dist'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Display success message
+        run: |
+          echo "═══════════════════════════════════════════════════"
+          echo "✅ ПРОЕКТ УСПЕШНО ОПУБЛИКОВАН!"
+          echo "═══════════════════════════════════════════════════"
+          echo ""
+          echo "🌐 Ваш сайт доступен по адресу:"
+          echo "https://kaylas000.github.io/boxing-idle-game/"
+          echo ""
+          echo "Теперь игра доступна из любого браузера!"
+          echo "═══════════════════════════════════════════════════"
