@@ -8,7 +8,7 @@
 
 **Boxing Champion** - это инновационная Web3 игра в стиле idle-clicker, где игроки развивают карьеру виртуального боксёра, зарабатывают реальные криптоактивы (BOX токены и NFT) и соревнуются с другими игроками в PvP и турнирах.
 
-[🎮 Играть сейчас](https://t.me/your_bot) | [📖 Документация](./docs) | [💬 Сообщество](https://t.me/boxing_champion)
+[🎮 Играть сейчас](https://t.me/your_bot) | [📖 Документация](./docs) | [⚡ Быстрый старт](./QUICK_START.md) | [💬 Сообщество](https://t.me/boxing_champion)
 
 ---
 
@@ -120,6 +120,9 @@ boxing-idle-game/
 │       └── frontend-ci.yml    # Frontend CI/CD
 │
 ├── docker-compose.yml          # Development environment
+├── setup.sh                    # Автоматическая установка (Linux/macOS)
+├── setup.ps1                   # Автоматическая установка (Windows)
+├── QUICK_START.md              # Быстрый старт и инструкции
 ├── README.md                   # Этот файл
 └── LICENSE                     # MIT License
 ```
@@ -174,100 +177,12 @@ Staking (50% APY):    Пассивный доход
 
 ## 🚀 Быстрый старт
 
-### Требования
+**Рекомендуется использовать автоматические скрипты:**
 
-```bash
-Node.js >= 18.x
-PostgreSQL >= 14.x
-Redis >= 6.x
-npm или yarn
-```
+- Linux/macOS: `./setup.sh`
+- Windows: `./setup.ps1`
 
-### 1. Клонирование репозитория
-
-```bash
-git clone https://github.com/kaylas000/boxing-idle-game.git
-cd boxing-idle-game
-```
-
-### 2. Установка зависимостей
-
-```bash
-# Backend
-cd backend
-npm install
-
-# Frontend
-cd ../frontend
-npm install
-```
-
-### 3. Настройка окружения
-
-#### Backend (.env)
-```env
-# Server
-PORT=3000
-NODE_ENV=development
-
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/boxing_champion
-
-# Redis
-REDIS_URL=redis://localhost:6379
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key
-JWT_EXPIRES_IN=7d
-
-# Telegram
-TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather
-
-# TON Blockchain
-TON_NETWORK=testnet
-TONCENTER_API_KEY=your_toncenter_api_key
-BOX_TOKEN_ADDRESS=EQD...
-NFT_COLLECTION_ADDRESS=EQD...
-GAME_MASTER_MNEMONIC="word1 word2 ... word24"
-```
-
-#### Frontend (.env.local)
-```env
-VITE_BACKEND_URL=http://localhost:3000
-VITE_WS_URL=ws://localhost:3000
-```
-
-### 4. Запуск инфраструктуры
-
-```bash
-# Запустить PostgreSQL + Redis через Docker
-docker-compose up -d postgres redis
-```
-
-### 5. Миграции базы данных
-
-```bash
-cd backend
-npm run migration:run
-```
-
-### 6. Запуск приложения
-
-```bash
-# Backend (терминал 1)
-cd backend
-npm run start:dev
-
-# Frontend (терминал 2)
-cd frontend
-npm run dev
-```
-
-### 7. Открыть в браузере
-
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3000
-- **API Docs (Swagger)**: http://localhost:3000/api/docs
+Подробно: см. [QUICK_START.md](./QUICK_START.md)
 
 ---
 
