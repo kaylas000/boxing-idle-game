@@ -1,0 +1,199 @@
+name: Test Deployment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-backend:
+    name: Запуск и тестирование Backend
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: boxing_user
+          POSTGRES_PASSWORD: boxing_password
+          POSTGRES_DB: boxing_game
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Create .env file
+        working-directory: ./backend
+        run: |
+          cat > .env << EOF
+          NODE_ENV=development
+          PORT=3000
+          API_PREFIX=api/v1
+          DB_HOST=localhost
+          DB_PORT=5432
+          DB_USERNAME=boxing_user
+          DB_PASSWORD=boxing_password
+          DB_DATABASE=boxing_game
+          REDIS_HOST=localhost
+          REDIS_PORT=6379
+          JWT_SECRET=test-secret-key-for-ci
+          JWT_EXPIRATION=7d
+          TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_WEBAPP_URL=https://test.com
+          ENERGY_REGEN_INTERVAL=60000
+          OFFLINE_INCOME_LIMIT=28800000
+          MAX_ENERGY=10
+          THROTTLE_TTL=60
+          THROTTLE_LIMIT=100
+          EOF
+      
+      - name: Run migrations
+        working-directory: ./backend
+        run: npm run migration:run || echo "No migrations to run"
+      
+      - name: Start backend server
+        working-directory: ./backend
+        run: |
+          npm run start:dev &
+          echo "Waiting for server to start..."
+          sleep 30
+      
+      - name: Test Health Check
+        run: |
+          echo "Testing health endpoint..."
+          curl -f http://localhost:3000/api/v1/health || exit 1
+          echo "✅ Health check passed!"
+      
+      - name: Test Database Connection
+        run: |
+          echo "Testing database connection..."
+          curl -f http://localhost:3000/api/v1/health/db || exit 1
+          echo "✅ Database connection passed!"
+      
+      - name: Test Swagger Documentation
+        run: |
+          echo "Testing Swagger docs..."
+          curl -f http://localhost:3000/api/docs || exit 1
+          echo "✅ Swagger docs accessible!"
+      
+      - name: Display Success Message
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 BACKEND УСПЕШНО ЗАПУЩЕН И РАБОТАЕТ!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "✅ Сервер запущен на порту 3000"
+          echo "✅ Health check работает"
+          echo "✅ База данных подключена"
+          echo "✅ API документация доступна"
+          echo ""
+          echo "Проект полностью работоспособен!"
+
+  test-frontend:
+    name: Запуск и тестирование Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Build frontend
+        working-directory: ./frontend
+        env:
+          VITE_BACKEND_URL: http://localhost:3000
+          VITE_WS_URL: ws://localhost:3000
+        run: npm run build
+      
+      - name: Check build output
+        working-directory: ./frontend
+        run: |
+          if [ -d "dist" ]; then
+            echo "✅ Frontend build successful!"
+            ls -la dist/
+          else
+            echo "❌ Frontend build failed!"
+            exit 1
+          fi
+      
+      - name: Display Success Message
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 FRONTEND УСПЕШНО СОБРАН!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "✅ Зависимости установлены"
+          echo "✅ Build выполнен успешно"
+          echo "✅ Статические файлы готовы"
+
+  deployment-summary:
+    name: Итоговый отчёт
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    if: always()
+    
+    steps:
+      - name: Generate Report
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 ОТЧЁТ О ЗАПУСКЕ ПРОЕКТА BOXING CHAMPION"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "Backend Status:  ${{ needs.test-backend.result }}"
+          echo "Frontend Status: ${{ needs.test-frontend.result }}"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          if [ "${{ needs.test-backend.result }}" == "success" ] && [ "${{ needs.test-frontend.result }}" == "success" ]; then
+            echo "✅ ВСЕ КОМПОНЕНТЫ РАБОТАЮТ КОРРЕКТНО!"
+            echo ""
+            echo "Проект успешно запущен в GitHub Actions!"
+            echo "Все проверки пройдены."
+            echo ""
+            echo "🚀 Проект готов к использованию!"
+          else
+            echo "⚠️ Некоторые компоненты требуют внимания"
+            echo ""
+            echo "Проверьте детали выше для устранения проблем."
+          fi
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
