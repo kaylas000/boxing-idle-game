@@ -1,6 +1,7 @@
 {
-  "name": "boxing-idle-game-frontend",
+  "name": "club-ring-game-frontend",
   "version": "1.0.0",
+  "description": "Club Ring Game - Official Telegram Boxing Idle Game",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -8,6 +9,15 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
+  "keywords": [
+    "boxing",
+    "idle-game",
+    "telegram",
+    "gaming",
+    "club-ring"
+  ],
+  "author": "Club Ring Game",
+  "license": "MIT",
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",
     "axios": "^1.6.0",
