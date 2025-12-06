@@ -9,6 +9,7 @@ import {
   Trophy,
   Zap,
   Gift,
+  Users,
 } from 'lucide-react';
 import { QuestsBadge } from './QuestsBadge';
 
@@ -21,9 +22,10 @@ const Navigation: React.FC = () => {
     { icon: Fist, label: 'Fight', path: '/fight' },
     { icon: LayoutGrid, label: 'Cards', path: '/cards' },
     { icon: Trophy, label: 'Leaderboard', path: '/leaderboard' },
-    // NEW ITEMS - Added December 6, 2025
+    // UPDATED ITEMS - Added December 6, 2025
     { icon: Zap, label: 'Quests', path: '/quests', badge: true },
     { icon: Gift, label: 'Referrals', path: '/referrals' },
+    { icon: Users, label: 'Community', path: '/community' },
     { icon: User, label: 'Profile', path: '/profile' },
   ];
 
@@ -35,7 +37,7 @@ const Navigation: React.FC = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 to-slate-800/90 backdrop-blur-sm border-t border-slate-700 px-2 py-3 z-40">
-      <div className="flex justify-around items-center gap-1 max-w-full">
+      <div className="flex justify-around items-center gap-1 max-w-full overflow-x-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
@@ -44,7 +46,7 @@ const Navigation: React.FC = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-lg transition-colors relative ${
+              className={`flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-lg transition-colors relative flex-shrink-0 ${
                 active
                   ? 'text-blue-400 bg-blue-500/10'
                   : 'text-slate-400 hover:text-white'
