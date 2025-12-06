@@ -11,6 +11,8 @@ import { FightModule } from './modules/fight/fight.module';
 import { CardsModule } from './modules/cards/cards.module';
 import { ShopModule } from './modules/shop/shop.module';
 import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
+import { ReferralModule } from './modules/referral/referral.module';
+import { QuestsModule } from './modules/quests/quests.module';
 
 @Module({
   imports: [
@@ -56,6 +58,10 @@ import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
     CardsModule,
     ShopModule,
     LeaderboardModule,
+    
+    // NEW MODULES - Added December 6, 2025
+    ReferralModule,
+    QuestsModule,
   ],
 })
 export class AppModule {}
