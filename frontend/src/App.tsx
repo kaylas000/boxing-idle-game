@@ -8,6 +8,8 @@ import FightPage from './pages/FightPage';
 import CardsPage from './pages/CardsPage';
 import ProfilePage from './pages/ProfilePage';
 import LeaderboardPage from './pages/LeaderboardPage';
+import { ReferralPage } from './pages/ReferralPage';
+import { QuestsPage } from './pages/QuestsPage';
 
 function App() {
   useEffect(() => {
@@ -24,6 +26,9 @@ function App() {
           <Route path="cards" element={<CardsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="leaderboard" element={<LeaderboardPage />} />
+          {/* NEW ROUTES - Added December 6, 2025 */}
+          <Route path="referrals" element={<ReferralPage />} />
+          <Route path="quests" element={<QuestsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
