@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { playerAPI } from '@/lib/api';
 import { Coins, Star, Zap, Trophy } from 'lucide-react';
+import { ReferralBanner } from '../components/ReferralBanner';
 
 export default function HomePage() {
   const { data: player, isLoading } = useQuery({
@@ -31,6 +32,9 @@ export default function HomePage() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* NEW: Referral Banner - Added December 6, 2025 */}
+      <ReferralBanner />
+
       {/* Заголовок */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
