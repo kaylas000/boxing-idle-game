@@ -82,6 +82,19 @@ export class Player {
   @Column({ type: 'json', default: '{}' })
   upgrades: Record<string, number>;
 
+  // НОВЫЕ ПОЛЯ - Реферальная система
+  @Column({ nullable: true, unique: true })
+  referralCode: string;
+
+  @Column({ type: 'int', default: 0 })
+  loginStreak: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastLoginDate: Date;
+
+  @Column({ type: 'bigint', default: 0 })
+  boxTokens: number;
+
   // Временные метки
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   lastActive: Date;
